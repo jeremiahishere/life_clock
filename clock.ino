@@ -3,6 +3,8 @@ const int HOURS_DIGIT_2 = 1;
 const int HOURS_DIGIT_1 = 2;
 const int MINUTES_DIGIT_2 = 3;
 const int MINUTES_DIGIT_1 = 4;
+const int SECONDS_DIGIT_2 = 5;
+const int SECONDS_DIGIT_1 = 6;
 
 //the font system
 //font stolen from http://www.dafont.com/texas-led.font
@@ -101,10 +103,29 @@ const int digits[10][digitHeight] = {
     B01100000
   }
 };
+
+//updates the time from the chronodot
+//returns true if there is a change
+boolean updateTime()  {
+  DateTime now = RTC.now();
+ 
+  if(now.second() != seconds)  {
+    hours = now.hour();
+    minutes = now.minute();
+    seconds = now.second();
+    return true;
+  }
+  return false;
+}
   
 //add one minute to the time
+//used to manualy change the time
 void incrementTime()  {
-  minutes += 1;
+  seconds += 1;
+  if(seconds > 59)  {
+    seconds = 0;
+    minutes += 1;
+  }
   if(minutes > 59)  {
     minutes = 0;
     hours += 1;
@@ -129,6 +150,10 @@ void writeTime()  {
   writeDigit(minutes / 10, MINUTES_DIGIT_2);
   //minutes digit 1
   writeDigit(minutes % 10, MINUTES_DIGIT_1);
+  //seconds digit 2
+  writeDigit(seconds / 10, SECONDS_DIGIT_2);
+  //seconds digit 1
+  writeDigit(seconds % 10, SECONDS_DIGIT_1);
 }
 
 //write a digit to the game of life board
@@ -137,19 +162,20 @@ void writeDigit(int x, int position)  {
   int startY;
 
   if(position == HOURS_DIGIT_2)  {
-    //hours digit 2
-    startX = 2; startY = 8;    
+    startX = 2; startY = 5;    
   } else if(position == HOURS_DIGIT_1) {
-    //hours digit 1
-    startX = 8; startY = 8;
+    startX = 9; startY = 5;
   } else if(position == MINUTES_DIGIT_2)  {
-    //minutes digit 2
-    startX = 19; startY = 8;
-  } else { //MINUTES_DIGIT_1
-    startX = 25; startY = 8;
-  }    
+    startX = 18; startY = 5;
+  } else if(position == MINUTES_DIGIT_1)  {
+    startX = 25; startY = 5;
+  } else if(position == SECONDS_DIGIT_2)  {
+    startX = 34; startY = 5;
+  } else if(position == SECONDS_DIGIT_1)  {
+    startX = 41; startY = 5;
+  }
   //blank the area
-  setRectangle(getNextBoard(), startX-1, startY, digitWidth+2, digitHeight, false);
+  setRectangle(getNextBoard(), startX-1, startY-1, digitWidth+2, digitHeight+2, false);
  
   for(int i = 0; i < digitHeight; i++)  {
     for(int j = 0; j < digitWidth; j++)  {

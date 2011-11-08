@@ -2,12 +2,12 @@
 
 
 //hard coded board size
-const int boardWidth = 32;
+const int boardWidth = 48;
 const int boardContainerWidth = 4;
-const int boardHeight = 24;
+const int boardHeight = 16;
 //the game of life board
 //two boards that switch back and forth
-int board[2][24][4];
+int board[2][boardHeight][boardWidth / 8];
 int currentBoard = 0;
 
 //zero out both boards
@@ -162,29 +162,20 @@ void iterateBoard()  {
   }
 }
 
-//write board to serial out
+//update the board and write it to serial out
 void writeBoard()  {
   for(int i = 0; i < boardHeight; i++)  {
     for(int j = 0; j < boardWidth; j++) {
       boolean value = getCell(j, i);
-      Serial.print(value);
-      
-      if(j < 16)  {
+      //Serial.print(value);
         if(value)  {
-          matrix.setPixel(23 - i, j);
+          matrix.setPixel(j, i);
         } else {
-          matrix.clrPixel(23 - i, j);
+          matrix.clrPixel(j, i);
         } 
-      } else {
-        if(value)  {
-          matrix.setPixel(i + 24, 31 - j);
-        } else {
-          matrix.clrPixel(i + 24, 31 - j);
-        }   
-      }   
     }
-    Serial.print("\n");
+    //Serial.print("\n");
   }
-  Serial.print("\n\n\n");
+  //Serial.print("\n\n\n");
   matrix.writeScreen();
 }

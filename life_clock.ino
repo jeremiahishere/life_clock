@@ -1,3 +1,4 @@
+//setup for matrix
 #include <HT1632.h>
 #define DATA 2
 #define WR   3
@@ -17,54 +18,70 @@ int cellMask[8] = {
   cellMask[7] = B10000000
 };
 
+//setup for chronodot
+#include <Wire.h>
+#include "Chronodot.h"
+Chronodot RTC;
+
+
 //the current time
 int hours;
 int minutes;
+int seconds;
 int tick;
 
 //initialize the main board arrays
 //at some point, initialize the leds and chronodot
 void setup() {
   Serial.begin(9600);
+  
+  Serial.println("Initializing Chronodot.");
+  Wire.begin();
+  RTC.begin();
+
+  if (! RTC.isrunning()) {
+    Serial.println("RTC is NOT running!");
+
+  } else {
+        // following line sets the RTC to the date & time this sketch was compiled
+    Serial.println(__DATE__);
+    Serial.println(__TIME__);
+    RTC.adjust(DateTime(__DATE__, __TIME__));
+  }
+  
   initializeBoard();
   matrix.begin(HT1632_COMMON_16NMOS);  
   matrix.fillScreen();
   delay(500);
-  matrix.clearScreen(); 
-  //create an r pentomino to test the algorithm
-  //testBoardSetup();
+  matrix.clearScreen();
   
+  //default to midnight/noon
+  //should be overriden on first call to chronodot
   hours = 12;
-  minutes = 30;
-  tick = 1;
+  minutes = 00;
+  seconds = 0;
 }
 
 void loop()  {
-  Serial.print(hours);
-  Serial.print(":");
-  Serial.print(minutes);
-  Serial.print("\n");
+  //update time from chronodot
+  //updated should be true if time has changed
+  boolean updated = updateTime();
+  if(updated)  {
+    writeTime();
+  }  
   
-  //shange next board to the current board
+  //switch current and future boards
   switchBoard();
-  //write to serial port (eventually to led)
+  //write current board to matrix
   writeBoard();
-  //iterate the game of life
+  //iterate game of life on future board
   iterateBoard();
   
-  
-  //write time to the game of life board
-  //eventually only write once a second instead of every few ticks
-  if(tick%5 == 0)  {
-    //increase time by 1 minute (for now)
-    incrementTime();
-    writeTime();
-    tick = 1;
+  if(updated)  {
+    delay(400);
   } else {
-   tick += 1;
-  } 
-
-  delay(10);
+    delay(1);
+  }
 }
 
 
