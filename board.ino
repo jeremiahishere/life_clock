@@ -1,3 +1,6 @@
+
+
+
 //hard coded board size
 const int boardWidth = 32;
 const int boardContainerWidth = 4;
@@ -95,6 +98,12 @@ void setRectangle(int boardId, int startX, int startY, int width, int height, bo
 
 //get the value of a cell from the board
 boolean getCell(int x, int y)  {
+  //turn board into a torroid for get calls
+  if(x < 0)  { x += boardWidth; }
+  if(x >= boardWidth) { x -= boardWidth; }
+  if(y < 0) { y += boardHeight; }
+  if(y >= boardHeight) { y -= boardHeight;}
+  
   if(x >= 0 && y >= 0 && x < boardWidth && y < boardHeight)  {
     int containerId = x / 8;
     int maskId = x % 8;
@@ -157,9 +166,25 @@ void iterateBoard()  {
 void writeBoard()  {
   for(int i = 0; i < boardHeight; i++)  {
     for(int j = 0; j < boardWidth; j++) {
-      Serial.print(getCell(j, i));
+      boolean value = getCell(j, i);
+      Serial.print(value);
+      
+      if(j < 16)  {
+        if(value)  {
+          matrix.setPixel(23 - i, j);
+        } else {
+          matrix.clrPixel(23 - i, j);
+        } 
+      } else {
+        if(value)  {
+          matrix.setPixel(i + 24, 31 - j);
+        } else {
+          matrix.clrPixel(i + 24, 31 - j);
+        }   
+      }   
     }
     Serial.print("\n");
   }
   Serial.print("\n\n\n");
+  matrix.writeScreen();
 }

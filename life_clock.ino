@@ -1,3 +1,9 @@
+#include <HT1632.h>
+#define DATA 2
+#define WR   3
+#define CS   4
+#define CS2  5
+HT1632LEDMatrix matrix = HT1632LEDMatrix(DATA, WR, CS, CS2);
 
 //mask used to pull boolean values out of integers
 int cellMask[8] = {
@@ -14,17 +20,23 @@ int cellMask[8] = {
 //the current time
 int hours;
 int minutes;
+int tick;
 
 //initialize the main board arrays
 //at some point, initialize the leds and chronodot
 void setup() {
   Serial.begin(9600);
   initializeBoard();
+  matrix.begin(HT1632_COMMON_16NMOS);  
+  matrix.fillScreen();
+  delay(500);
+  matrix.clearScreen(); 
   //create an r pentomino to test the algorithm
-  testBoardSetup();
+  //testBoardSetup();
   
   hours = 12;
   minutes = 30;
+  tick = 1;
 }
 
 void loop()  {
@@ -39,13 +51,20 @@ void loop()  {
   writeBoard();
   //iterate the game of life
   iterateBoard();
-  //increase time by 1 minute (for now)
-  incrementTime();
+  
+  
   //write time to the game of life board
-  //eventually only write every few ticks instead of every tick
-  writeTime();   
+  //eventually only write once a second instead of every few ticks
+  if(tick%5 == 0)  {
+    //increase time by 1 minute (for now)
+    incrementTime();
+    writeTime();
+    tick = 1;
+  } else {
+   tick += 1;
+  } 
 
-  delay(2000);
+  delay(10);
 }
 
 

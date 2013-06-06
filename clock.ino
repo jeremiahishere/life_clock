@@ -138,18 +138,18 @@ void writeDigit(int x, int position)  {
 
   if(position == HOURS_DIGIT_2)  {
     //hours digit 2
-    startX = 4; startY = 8;    
+    startX = 2; startY = 8;    
   } else if(position == HOURS_DIGIT_1) {
     //hours digit 1
-    startX = 10; startY = 8;
+    startX = 8; startY = 8;
   } else if(position == MINUTES_DIGIT_2)  {
     //minutes digit 2
-    startX = 17; startY = 8;
+    startX = 19; startY = 8;
   } else { //MINUTES_DIGIT_1
-    startX = 23; startY = 8;
+    startX = 25; startY = 8;
   }    
   //blank the area
-  setRectangle(getNextBoard(), startX, startY, digitWidth, digitHeight, false);
+  setRectangle(getNextBoard(), startX-1, startY, digitWidth+2, digitHeight, false);
  
   for(int i = 0; i < digitHeight; i++)  {
     for(int j = 0; j < digitWidth; j++)  {
